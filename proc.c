@@ -190,13 +190,14 @@ fork(void)
   }
 
   // Copy process state from proc.
-  if((np->pgdir = copyuvm(curproc->pgdir, curproc->sz)) == 0){
+  if((np->pgdir = copyuvm(curproc->pgdir, curproc->sz, curproc->stackSize))){
     kfree(np->kstack);
     np->kstack = 0;
     np->state = UNUSED;
     return -1;
   }
   np->sz = curproc->sz;
+  np->stackSize = curproc->stackSize;
   np->parent = curproc;
   *np->tf = *curproc->tf;
 
@@ -531,4 +532,10 @@ procdump(void)
     }
     cprintf("\n");
   }
+}
+
+//S.R.
+void
+test(void){
+    cprintf("\ntesting program...\n");
 }

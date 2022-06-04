@@ -30,4 +30,5 @@ SYSCALL(sbrk)
 SYSCALL(sleep)
 SYSCALL(uptime)
 SYSCALL(shm_open)
-SYSCALL(shm_close)	
+SYSCALL(shm_close)
+SYSCALL(test) //S.R.
