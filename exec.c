@@ -13,7 +13,7 @@ exec(char *path, char **argv)
   char *s, *last;
   int i, off;
   uint argc, sz, sp, ustack[3+MAXARG+1];
-  uint stackSize;
+  uint sizeStack;
   struct elfhdr elf;
   struct inode *ip;
   struct proghdr ph;
@@ -66,13 +66,12 @@ exec(char *path, char **argv)
   sz = PGROUNDUP(sz);
 
   //size of stack is below kernel memory
-  stackSize = KERNBASE - PGSIZE; //S.R
-  if((allocuvm(pgdir, stackSize - 1, KERNBASE - 1)) == 0) //S.R
+  if((allocuvm(pgdir, KERNBASE - PGSIZE - 1, KERNBASE - 1)) == 0) //S.R
           goto bad;
 
   //stack pointer to keep track of stack size
   sp = KERNBASE - 4; //S.R.
-  stackSize = 1;
+  sizeStack = 1;
 
     // Push argument strings, prepare rest of stack in ustack.
   for(argc = 0; argv[argc]; argc++) {
@@ -102,7 +101,8 @@ exec(char *path, char **argv)
   // Commit to the user image.
   oldpgdir = curproc->pgdir;
   curproc->pgdir = pgdir;
-  curproc->stackSize = stackSize;
+  curproc->sz = sz;
+  curproc->stackSize = sizeStack;
   curproc->tf->eip = elf.entry;  // main
   curproc->tf->esp = sp;
   switchuvm(curproc);
